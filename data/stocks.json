@@ -1,0 +1,11 @@
+{
+  "last_updated": "2026-02-07T14:00:00Z",
+  "stocks": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple",
+      "price": 189.32,
+      "updated": "2026-02-07T14:00:00Z"
+    }
+  ]
+}

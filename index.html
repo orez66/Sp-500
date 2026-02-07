@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>S&P 500 – Hourly Price Snapshot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+      margin: 0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .timestamp {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #ffffff;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #222;
+      color: #fff;
+      position: sticky;
+      top: 0;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      table {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>S&P 500 – Hourly Price Snapshot</h1>
+<div class="timestamp" id="lastUpdated">Loading data...</div>
+
+<table id="stocksTable"></table>
+
+<div class="error" id="error"></div>
+
+<script>
+/* ================= CONFIG ================= */
+
+const SYMBOLS = [
+  { symbol: "AAPL", name: "Apple" },
+  { symbol: "MSFT", name: "Microsoft" },
+  { symbol: "GOOGL", name: "Alphabet" },
+  { symbol: "AMZN", name: "Amazon" },
+  { symbol: "META", name: "Meta Platforms" },
+  { symbol: "NVDA", name: "NVIDIA" },
+  { symbol: "TSLA", name: "Tesla" }
+];
+
+// Refresh every hour
+const REFRESH_INTERVAL = 60 * 60 * 1000;
+
+/* ================= FUNCTIONS ================= */
+
+async function fetchStocks() {
+  const symbolsStr = SYMBOLS.map(s => s.symbol).join(",");
+  const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolsStr}`;
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Network error");
+
+  const json = await response.json();
+  return json.quoteResponse.result;
+}
+
+function renderTable(data) {
+  const table = document.getElementById("stocksTable");
+
+  table.innerHTML = `
+    <tr>
+      <th>Ticker</th>
+      <th>Company</th>
+      <th>Current Price ($)</th>
+      <th>Market Time</th>
+    </tr>
+  `;
+
+  data.forEach(stock => {
+    table.innerHTML += `
+      <tr>
+        <td>${stock.symbol}</td>
+        <td>${stock.longName || stock.shortName || "-"}</td>
+        <td>${stock.regularMarketPrice ?? "-"}</td>
+        <td>${stock.regularMarketTime
+          ? new Date(stock.regularMarketTime * 1000).toLocaleString()
+          : "-"}</td>
+      </tr>
+    `;
+  });
+}
+
+function updateTimestamp() {
+  document.getElementById("lastUpdated").innerText =
+    "Last refreshed: " + new Date().toLocaleString();
+}
+
+/* ================= MAIN ================= */
+
+async function refreshData() {
+  document.getElementById("error").innerText = "";
+
+  try {
+    const data = await fetchStocks();
+    renderTable(data);
+    updateTimestamp();
+  } catch (err) {
+    document.getElementById("error").innerText =
+      "Failed to load stock data. Please try again later.";
+  }
+}
+
+// Initial load
+refreshData();
+
+// Hourly refresh
+setInterval(refreshData, REFRESH_INTERVAL);
+</script>
+
+</body>
+</html>

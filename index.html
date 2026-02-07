@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>S&P 500 Hourly Refresh</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .timestamp {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #222;
+      color: #fff;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>S&P 500 – Hourly Price Snapshot</h1>
+<div class="timestamp" id="lastUpdated"></div>
+
+<table id="stocksTable"></table>
+
+<div class="error" id="error"></div>
+
+<script>
+/* ================= CONFIG ================= */
+
+const API_KEY = "YOUR_API_KEY_HERE";
+const API_URL = "https://www.alphavantage.co/query";
+
+const SYMBOLS = [
+  { symbol: "
